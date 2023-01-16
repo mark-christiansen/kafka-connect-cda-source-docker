@@ -17,6 +17,7 @@ EOF
 echo "Crete volumes"
 mkdir volumes/grafana
 mkdir volumes/kafka-1
+mkdir volumes/postgres
 mkdir volumes/prometheus
 mkdir volumes/zoo-1
 

@@ -15,7 +15,7 @@ S3_SECRET_KEY=""
 DB_URL="jdbc:postgresql://postgres:5432/dba"
 DB_USER="kafka-connect-user"
 DB_PASS="K@fk@Conn3ct!"
-DB_NAME="dev"
+DB_NAME="public"
 
 printf 'Waiting until connect server REST API is ready to accept requests'
 until $(curl --output /dev/null --silent --head --fail ${CONNECT_SERVER_URL}/connectors); do
@@ -38,7 +38,7 @@ POST_DATA=$(cat <<EOF
     "fs.s3a.secret.key": "${S3_SECRET_KEY}",
     "table.whitelist": "",
     "table.blacklist": "",
-    "topic": "${ENV}.raw.cda.policy",
+    "topic": "${ENV}.raw.cda.${SOURCE_TYPE}",
     "broker.url": "kafka1.mycompany.com:29092",
     "broker.jaas.user": "",
     "broker.jaas.password": "",
@@ -69,39 +69,45 @@ echo ''
 curl -k --header "Content-Type: application/json" --request POST --data "$POST_DATA" ${CONNECT_SERVER_URL}/connectors
 echo ''
 
-#POST_DATA=$(cat <<EOF
-#{
-#  "name": "${ENV}-postgres-${SOURCE_TYPE}",
-#  "config": {
-#    "connector.class": "io.confluent.connect.jdbc.JdbcSinkConnector",
-#    "tasks.max": "1",
-#    "connection.url": "${DB_URL}",
-#    "connection.user": "${DB_USER}",
-#    "connection.password": "${DB_PASS}",
-#    "topics.regex": "${ENV}\\\\.canonical\\\\.cda\\\\.(pc_(.*)|pctl_(.*)|pcx_(.*))",
-#    "table.name.format": "\${topic}",
-#    "auto.create": "true",
-#    "auto.evolve": "true",
-#    "pk.mode": "record_key",
-#    "insert.mode": "upsert",
-#    "delete.enabled": "true",
-#    "errors.tolerance": "all",
-#    "errors.deadletterqueue.topic.name": "${ENV}.postgres.${SOURCE_TYPE}.dlq",
-#    "errors.deadletterqueue.topic.replication.factor": 1,
-#    "errors.deadletterqueue.context.headers.enable": true,
-#    "errors.retry.delay.max.ms": 10000,
-#    "errors.retry.timeout": 30000,
-#    "errors.log.enable": "true",
-#    "errors.log.include.messages": "true",
-#    "transforms": "RenameTopic",
-#    "transforms.RenameTopic.type": com.mycompany.kafka.connect.cda.source.transform.SetTopicNameFromRecord",
-#    "transforms.RenameTopic.topic.prefix": "${DB_SCHEMA}."
-#  }
-#}
-#EOF
-#)
-#
-#echo "$POST_DATA"
-#echo ''
-#curl -k --header "Content-Type: application/json" --request POST --data "$POST_DATA" ${CONNECT_SERVER_URL}/connectors
-#echo ''
+POST_DATA=$(cat <<EOF
+{
+  "name": "${ENV}-postgres-${SOURCE_TYPE}",
+  "config": {
+    "connector.class": "io.confluent.connect.jdbc.JdbcSinkConnector",
+    "tasks.max": "1",
+    "connection.url": "${DB_URL}",
+    "connection.user": "${DB_USER}",
+    "connection.password": "${DB_PASS}",
+    "topics.regex": "${ENV}\\\\.raw\\\\.cda\\\\.${SOURCE_TYPE}\\\\.all",
+    "table.name.format": "\${topic}",
+    "auto.create": "true",
+    "auto.evolve": "true",
+    "pk.mode": "record_key",
+    "insert.mode": "upsert",
+    "delete.enabled": "true",
+    "errors.tolerance": "all",
+    "errors.deadletterqueue.topic.name": "${ENV}.postgres.${SOURCE_TYPE}.dlq",
+    "errors.deadletterqueue.topic.replication.factor": 1,
+    "errors.deadletterqueue.context.headers.enable": true,
+    "errors.retry.delay.max.ms": 10000,
+    "errors.retry.timeout": 30000,
+    "errors.log.enable": "true",
+    "errors.log.include.messages": "true",
+    "key.converter": "io.confluent.connect.avro.AvroConverter",
+    "key.converter.schema.registry.url": "http://schema1.mycompany.com:8081",
+    "key.converter.key.subject.name.strategy": "io.confluent.kafka.serializers.subject.RecordNameStrategy",
+    "value.converter": "io.confluent.connect.avro.AvroConverter",
+    "value.converter.schema.registry.url": "http://schema1.mycompany.com:8081",
+    "value.converter.value.subject.name.strategy": "io.confluent.kafka.serializers.subject.RecordNameStrategy",
+    "transforms": "RenameTopic",
+    "transforms.RenameTopic.type": "com.mycompany.kafka.connect.cda.source.transform.SetTopicNameFromRecord",
+    "transforms.RenameTopic.topic.prefix": "${DB_SCHEMA}."
+  }
+}
+EOF
+)
+
+echo "$POST_DATA"
+echo ''
+curl -k --header "Content-Type: application/json" --request POST --data "$POST_DATA" ${CONNECT_SERVER_URL}/connectors
+echo ''

@@ -4,10 +4,10 @@ echo "Stopping Kafka environment"
 docker compose down
 
 echo "Cleaning up volumes"
-rm -rf volumes/s3/billing-center
-rm -rf volumes/s3/policy-center
-rm -rf volumes/grafana/data
-rm -rf volumes/kafka-1/data
-rm -rf volumes/prometheus/data
-rm -rf volumes/zoo-1/data
-rm -rf volumes/zoo-1/logs
+find volumes/s3/billing-center -mindepth 1 -delete
+find volumes/s3/policy-center -mindepth 1 -delete
+find volumes/grafana -mindepth 1 -delete
+find volumes/kafka-1 -mindepth 1 -delete
+find volumes/postgres -mindepth 1 -delete
+find volumes/prometheus -mindepth 1 -delete
+find volumes/zoo-1 -mindepth 1 -delete
