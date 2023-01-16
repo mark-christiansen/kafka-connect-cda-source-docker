@@ -76,7 +76,7 @@ echo ''
 
 #POST_DATA=$(cat <<EOF
 #{
-#  "name": "${ENV}-aurora-${SOURCE_TYPE}",
+#  "name": "${ENV}-postgres-${SOURCE_TYPE}",
 #  "config": {
 #    "connector.class": "io.confluent.connect.jdbc.JdbcSinkConnector",
 #    "tasks.max": "1",
@@ -91,16 +91,16 @@ echo ''
 #    "insert.mode": "upsert",
 #    "delete.enabled": "true",
 #    "errors.tolerance": "all",
-#    "errors.deadletterqueue.topic.name": "${ENV}.aurora.${SOURCE_TYPE}.dlq",
+#    "errors.deadletterqueue.topic.name": "${ENV}.postgres.${SOURCE_TYPE}.dlq",
 #    "errors.deadletterqueue.topic.replication.factor": 1,
 #    "errors.deadletterqueue.context.headers.enable": true,
 #    "errors.retry.delay.max.ms": 10000,
 #    "errors.retry.timeout": 30000,
 #    "errors.log.enable": "true",
 #    "errors.log.include.messages": "true",
-#    "transforms": "TopicName",
-#    "transforms.TopicName.type": "com.wnins.kafka.connect.guidewire.source.transform.SetTopicNameFromRecord",
-#    "transforms.TopicName.topic.prefix": "${DB_SCHEMA}."
+#    "transforms": "RenameTopic",
+#    "transforms.RenameTopic.type": com.mycompany.kafka.connect.cda.source.transform.SetTopicNameFromRecord",
+#    "transforms.RenameTopic.topic.prefix": "${DB_SCHEMA}."
 #  }
 #}
 #EOF
