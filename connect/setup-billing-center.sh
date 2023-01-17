@@ -25,11 +25,6 @@ done
 echo ""
 echo "Connect server REST API is ready to accept requests"
 
-#echo "Creating topic ${ENV}.${SOURCE_TYPE}.table.changes..."
-#docker exec -it broker /bin/bash -c "kafka-topics --bootstrap-server localhost:9092 --create --topic ${ENV}.${SOURCE_TYPE}.table.changes --partitions 1 --replication-factor 1"
-#echo "Successfully created topic ${ENV}.${SOURCE_TYPE}.table.changes"
-#echo ''
-
 POST_DATA=$(cat <<EOF
 {
   "name": "${ENV}-cda-${SOURCE_TYPE}",
@@ -68,11 +63,10 @@ POST_DATA=$(cat <<EOF
 }
 EOF
 )
-
-#echo "$POST_DATA"
-#echo ''
-#curl -k -H "Accept: application/json" -H "Content-Type: application/json" -X POST --data "$POST_DATA" $CONNECT_SERVER_URL/connectors
-#echo ''
+echo "$POST_DATA"
+echo ''
+curl -k -H "Accept: application/json" -H "Content-Type: application/json" -X POST --data "$POST_DATA" $CONNECT_SERVER_URL/connectors
+echo ''
 
 POST_DATA=$(cat <<EOF
 {

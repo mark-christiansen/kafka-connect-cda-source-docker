@@ -15,7 +15,7 @@ S3_SECRET_KEY=""
 DB_URL="jdbc:postgresql://postgres:5432/dba"
 DB_USER="kafka-connect-user"
 DB_PASS="K@fk@Conn3ct!"
-DB_NAME="public"
+DB_SCHEMA="public"
 
 printf 'Waiting until connect server REST API is ready to accept requests'
 until $(curl --output /dev/null --silent --head --fail ${CONNECT_SERVER_URL}/connectors); do
@@ -63,7 +63,6 @@ POST_DATA=$(cat <<EOF
 }
 EOF
 )
-
 echo "$POST_DATA"
 echo ''
 curl -k --header "Content-Type: application/json" --request POST --data "$POST_DATA" ${CONNECT_SERVER_URL}/connectors
@@ -106,7 +105,6 @@ POST_DATA=$(cat <<EOF
 }
 EOF
 )
-
 echo "$POST_DATA"
 echo ''
 curl -k --header "Content-Type: application/json" --request POST --data "$POST_DATA" ${CONNECT_SERVER_URL}/connectors
